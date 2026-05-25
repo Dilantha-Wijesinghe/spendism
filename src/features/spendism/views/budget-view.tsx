@@ -92,7 +92,7 @@ export function BudgetView({
     const errs: Record<string, string> = {};
     const parsed = parseFloat(form.amount);
     if (!form.categoryId) errs.categoryId = "Select a category";
-    if (!form.amount || isNaN(parsed) || parsed <= 0) errs.amount = "Enter a valid amount";
+    if (!form.amount || isNaN(parsed) || parsed <= 0 || parsed > 999_999_999) errs.amount = "Enter a valid amount";
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       return;
@@ -129,16 +129,9 @@ export function BudgetView({
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight">Budget</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {now.toLocaleString("default", { month: "long" })} {year}
-          </p>
-        </div>
-        {/* Desktop add button — mobile uses FAB */}
-        <Button onClick={openAdd} size="sm" className="gap-2 hidden sm:flex">
+      {/* Desktop add button — mobile uses FAB */}
+      <div className="hidden sm:flex justify-end">
+        <Button onClick={openAdd} size="sm" className="gap-2">
           <Plus className="h-4 w-4" />
           Add Budget
         </Button>

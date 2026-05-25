@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CATEGORY_COLORS } from "@/lib/categories";
+import { CATEGORY_COLORS, CATEGORY_ICON_NAMES } from "@/lib/categories";
 import type { Category } from "@/lib/types";
 
 interface CategoryIconProps {
@@ -17,8 +17,10 @@ export function CategoryIcon({ category, size = "md", className }: CategoryIconP
   const iconSizes = { sm: "h-3 w-3", md: "h-4 w-4", lg: "h-5 w-5" };
   const containerSizes = { sm: "h-6 w-6", md: "h-8 w-8", lg: "h-10 w-10" };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const IconComponent = (LucideIcons as Record<string, any>)[category.icon] as React.ComponentType<{ className?: string }> | undefined;
+  const safeIconName = CATEGORY_ICON_NAMES.includes(category.icon) ? category.icon : null;
+  const IconComponent = safeIconName
+    ? (LucideIcons as Record<string, unknown>)[safeIconName] as React.ComponentType<{ className?: string }> | undefined
+    : undefined;
 
   return (
     <span

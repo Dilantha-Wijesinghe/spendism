@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   BottomSheet,
   BottomSheetContent,
@@ -37,6 +37,39 @@ const RECURRENCE_OPTIONS: { value: RecurrenceType; label: string }[] = [
   { value: "yearly", label: "Yearly" },
 ];
 
+interface FormFields {
+  type: TransactionType;
+  amount: string;
+  categoryId: string;
+  description: string;
+  date: string;
+  recurrence: RecurrenceType;
+  tags: string;
+}
+
+function buildFields(tx: Transaction | null | undefined, defaultType: TransactionType): FormFields {
+  if (tx) {
+    return {
+      type: tx.type,
+      amount: String(tx.amount),
+      categoryId: tx.categoryId,
+      description: tx.description,
+      date: tx.date,
+      recurrence: tx.recurrence,
+      tags: tx.tags.join(", "),
+    };
+  }
+  return {
+    type: defaultType,
+    amount: "",
+    categoryId: "",
+    description: "",
+    date: format(new Date(), "yyyy-MM-dd"),
+    recurrence: "none",
+    tags: "",
+  };
+}
+
 export function TransactionForm({
   open,
   onClose,
@@ -45,39 +78,16 @@ export function TransactionForm({
   initialTransaction,
   defaultType = "expense",
 }: TransactionFormProps) {
-  const [type, setType] = useState<TransactionType>(defaultType);
-  const [amount, setAmount] = useState("");
-  const [categoryId, setCategoryId] = useState("");
-  const [description, setDescription] = useState("");
-  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [recurrence, setRecurrence] = useState<RecurrenceType>("none");
-  const [tags, setTags] = useState("");
+  const [fields, setFields] = useState<FormFields>(() => buildFields(initialTransaction, defaultType));
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const isEditing = !!initialTransaction;
+  const { type, amount, categoryId, description, date, recurrence, tags } = fields;
 
-  useEffect(() => {
-    if (open) {
-      if (initialTransaction) {
-        setType(initialTransaction.type);
-        setAmount(String(initialTransaction.amount));
-        setCategoryId(initialTransaction.categoryId);
-        setDescription(initialTransaction.description);
-        setDate(initialTransaction.date);
-        setRecurrence(initialTransaction.recurrence);
-        setTags(initialTransaction.tags.join(", "));
-      } else {
-        setType(defaultType);
-        setAmount("");
-        setCategoryId("");
-        setDescription("");
-        setDate(format(new Date(), "yyyy-MM-dd"));
-        setRecurrence("none");
-        setTags("");
-      }
-      setErrors({});
-    }
-  }, [open, initialTransaction, defaultType]);
+  function set<K extends keyof FormFields>(key: K, value: FormFields[K]) {
+    setFields((f) => ({ ...f, [key]: value }));
+  }
+
+  const isEditing = !!initialTransaction;
 
   const availableCategories = categories.filter(
     (c) => c.type === type || c.type === "both"
@@ -86,7 +96,7 @@ export function TransactionForm({
   function validate() {
     const errs: Record<string, string> = {};
     const parsed = parseFloat(amount);
-    if (!amount || isNaN(parsed) || parsed <= 0) errs.amount = "Enter a valid amount";
+    if (!amount || isNaN(parsed) || parsed <= 0 || parsed > 999_999_999) errs.amount = "Enter a valid amount";
     if (!categoryId) errs.categoryId = "Select a category";
     if (!date) errs.date = "Select a date";
     return errs;
@@ -110,8 +120,9 @@ export function TransactionForm({
       date,
       tags: tags
         .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
+        .map((t) => t.trim().slice(0, 50))
+        .filter(Boolean)
+        .slice(0, 10),
       recurrence,
       createdAt: initialTransaction?.createdAt ?? now,
       updatedAt: now,
@@ -141,8 +152,7 @@ export function TransactionForm({
                   key={t}
                   type="button"
                   onClick={() => {
-                    setType(t);
-                    setCategoryId("");
+                    setFields((f) => ({ ...f, type: t, categoryId: "" }));
                   }}
                   className={cn(
                     "flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all duration-150",
@@ -174,7 +184,7 @@ export function TransactionForm({
                 step="0.01"
                 placeholder="0.00"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => set("amount", e.target.value)}
                 className={cn("tabular-amount text-lg font-semibold h-12", errors.amount && "border-destructive")}
                 autoFocus
               />
@@ -187,7 +197,7 @@ export function TransactionForm({
               <Select
                 value={categoryId}
                 onValueChange={(v) => {
-                  setCategoryId(v);
+                  set("categoryId", v);
                   setErrors((e) => ({ ...e, categoryId: "" }));
                 }}
               >
@@ -230,7 +240,8 @@ export function TransactionForm({
                 id="description"
                 placeholder="What was this for?"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => set("description", e.target.value.slice(0, 500))}
+                maxLength={500}
                 className="resize-none h-16"
               />
             </div>
@@ -243,14 +254,14 @@ export function TransactionForm({
                   id="date"
                   type="date"
                   value={date}
-                  onChange={(e) => setDate(e.target.value)}
+                  onChange={(e) => set("date", e.target.value)}
                   className={cn("h-11", errors.date && "border-destructive")}
                 />
                 {errors.date && <p className="text-xs text-destructive">{errors.date}</p>}
               </div>
               <div className="space-y-1.5">
                 <Label>Recurrence</Label>
-                <Select value={recurrence} onValueChange={(v) => setRecurrence(v as RecurrenceType)}>
+                <Select value={recurrence} onValueChange={(v) => set("recurrence", v as RecurrenceType)}>
                   <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
@@ -275,7 +286,7 @@ export function TransactionForm({
                 id="tags"
                 placeholder="e.g. work, reimbursable"
                 value={tags}
-                onChange={(e) => setTags(e.target.value)}
+                onChange={(e) => set("tags", e.target.value)}
                 className="h-11"
               />
             </div>

@@ -82,12 +82,9 @@ export function ReportsView({ data }: ReportsViewProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
-        <h2 className="text-xl font-bold tracking-tight">Reports</h2>
-        <div className="overflow-x-auto no-scrollbar">
-          <TimeFilter value={period} onChange={setPeriod} className="w-max" />
-        </div>
+      {/* Time filter */}
+      <div className="overflow-x-auto no-scrollbar">
+        <TimeFilter value={period} onChange={setPeriod} className="w-max" />
       </div>
 
       {/* Summary stats */}

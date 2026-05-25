@@ -112,7 +112,7 @@ export function SpendismApp() {
 
       <main className="flex-1 min-w-0 lg:py-8 lg:pr-8 pb-24 lg:pb-8">
         {/* Mobile header */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-4 bg-card/60 backdrop-blur-sm border-b border-border mb-4 sticky top-0 z-40">
+        <header className="lg:hidden flex items-center px-4 py-4">
           <h1 className="text-lg font-bold tracking-tight">
             spend<span className="text-primary">ism.</span>
           </h1>
@@ -171,6 +171,7 @@ export function SpendismApp() {
       </button>
 
       <TransactionForm
+        key={`${formOpen ? "open" : "closed"}-${editingTransaction?.id ?? "new"}-${defaultFormType}`}
         open={formOpen}
         onClose={() => {
           setFormOpen(false);

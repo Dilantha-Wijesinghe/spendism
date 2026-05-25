@@ -11,7 +11,6 @@ import {
 } from "@/lib/calculations";
 import { formatMoneyCompact } from "@/lib/money";
 import { Wallet, TrendingDown, TrendingUp, PiggyBank } from "lucide-react";
-import { format } from "date-fns";
 import type { AppData, ViewId } from "@/lib/types";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -74,24 +73,12 @@ export function DashboardView({
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Header — hidden on mobile (mobile header in app shell handles branding) */}
-      <div className="hidden sm:flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight">Dashboard</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {format(now, "MMMM yyyy")}
-          </p>
-        </div>
+      {/* Desktop add button */}
+      <div className="hidden sm:flex justify-end">
         <Button onClick={onAddTransaction} size="sm" className="gap-2">
           <TrendingUp className="h-4 w-4" />
           Add transaction
         </Button>
-      </div>
-
-      {/* Mobile page label */}
-      <div className="sm:hidden">
-        <h2 className="text-lg font-bold tracking-tight">Dashboard</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">{format(now, "MMMM yyyy")}</p>
       </div>
 
       {/* Net Balance hero — indigo gradient */}

@@ -62,18 +62,16 @@ export function TransactionsView({
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold tracking-tight">Transactions</h2>
-        {/* Desktop add button — mobile uses FAB */}
-        <Button onClick={() => onAddTransaction()} size="sm" className="gap-2 hidden sm:flex">
+      {/* Desktop add button — mobile uses FAB */}
+      <div className="hidden sm:flex justify-end">
+        <Button onClick={() => onAddTransaction()} size="sm" className="gap-2">
           <Plus className="h-4 w-4" />
           Add
         </Button>
       </div>
 
       {/* Filters — sticky so they stay visible while scrolling */}
-      <Card className="shadow-[var(--shadow-card)] sticky top-[73px] sm:top-0 z-30 bg-card/95 backdrop-blur-sm">
+      <Card className="shadow-[var(--shadow-card)] sticky top-0 z-30 bg-card/95 backdrop-blur-sm">
         <CardHeader className="p-3 space-y-3">
           {/* Search */}
           <div className="relative">

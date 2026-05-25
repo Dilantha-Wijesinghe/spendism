@@ -42,6 +42,11 @@ export function SettingsView({
     const file = e.target.files?.[0];
     if (!file) return;
     setImportMessage(null);
+    if (file.size > 5 * 1024 * 1024) {
+      setImportMessage({ type: "error", text: "File too large (max 5 MB)" });
+      e.target.value = "";
+      return;
+    }
     const { transactions: imported, errors } = await importTransactionsCSV(file);
     if (errors.length > 0 && imported.length === 0) {
       setImportMessage({ type: "error", text: `Import failed: ${errors[0]}` });
@@ -59,6 +64,11 @@ export function SettingsView({
     const file = e.target.files?.[0];
     if (!file) return;
     setImportMessage(null);
+    if (file.size > 5 * 1024 * 1024) {
+      setImportMessage({ type: "error", text: "File too large (max 5 MB)" });
+      e.target.value = "";
+      return;
+    }
     const restored = await importFullDataJSON(file);
     if (!restored) {
       setImportMessage({ type: "error", text: "Invalid backup file" });
@@ -71,8 +81,6 @@ export function SettingsView({
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold tracking-tight">Settings</h2>
-
       {/* Preferences */}
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader className="pb-3">

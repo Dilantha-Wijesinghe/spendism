@@ -23,8 +23,17 @@ export function loadData(): AppData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return { ...DEFAULT_DATA, categories: [...DEFAULT_CATEGORIES] };
-    const parsed = JSON.parse(raw) as AppData;
-    return migrate(parsed);
+    const parsed = JSON.parse(raw);
+    if (
+      !parsed ||
+      typeof parsed !== "object" ||
+      !Array.isArray(parsed.transactions) ||
+      !Array.isArray(parsed.budgets) ||
+      !Array.isArray(parsed.categories)
+    ) {
+      return { ...DEFAULT_DATA, categories: [...DEFAULT_CATEGORIES] };
+    }
+    return migrate(parsed as AppData);
   } catch {
     return { ...DEFAULT_DATA, categories: [...DEFAULT_CATEGORIES] };
   }
