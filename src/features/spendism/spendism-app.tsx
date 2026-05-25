@@ -107,7 +107,7 @@ export function SpendismApp() {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen lg:max-w-[1280px] lg:mx-auto lg:w-full">
       <NavBar activeView={activeView} onNavigate={setActiveView} />
 
       <main className="flex-1 min-w-0 lg:py-8 lg:pr-8 pb-24 lg:pb-8">
@@ -118,7 +118,7 @@ export function SpendismApp() {
           </h1>
         </header>
 
-        <div className="px-4 lg:px-0 max-w-5xl">
+        <div className="px-4 lg:px-0 max-w-5xl lg:mx-auto">
           {activeView === "dashboard" && (
             <DashboardView
               data={data}
