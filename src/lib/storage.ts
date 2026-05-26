@@ -18,6 +18,16 @@ const DEFAULT_DATA: AppData = {
   version: CURRENT_VERSION,
 };
 
+export function createDefaultData(): AppData {
+  return {
+    transactions: [],
+    budgets: [],
+    categories: [...DEFAULT_CATEGORIES],
+    settings: { ...DEFAULT_SETTINGS },
+    version: CURRENT_VERSION,
+  };
+}
+
 export function loadData(): AppData {
   if (typeof window === "undefined") return DEFAULT_DATA;
   try {

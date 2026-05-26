@@ -8,14 +8,15 @@ import { TransactionsView } from "./views/transactions-view";
 import { BudgetView } from "./views/budget-view";
 import { ReportsView } from "./views/reports-view";
 import { SettingsView } from "./views/settings-view";
-import { loadData, saveData, clearData } from "@/lib/storage";
+import { createDefaultData, loadData, saveData, clearData } from "@/lib/storage";
 import { Plus } from "lucide-react";
 import type { AppData, Transaction, Budget, AppSettings, TransactionType, ViewId } from "@/lib/types";
 
 export type { ViewId };
 
 export function SpendismApp() {
-  const [data, setData] = useState<AppData>(() => loadData());
+  const [data, setData] = useState<AppData>(() => createDefaultData());
+  const [hydrated, setHydrated] = useState(false);
   const [activeView, setActiveView] = useState<ViewId>("dashboard");
   const [formOpen, setFormOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
@@ -23,8 +24,13 @@ export function SpendismApp() {
   const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
 
   useEffect(() => {
-    saveData(data);
-  }, [data]);
+    if (hydrated) saveData(data);
+  }, [hydrated, data]);
+
+  useEffect(() => {
+    setData(loadData());
+    setHydrated(true);
+  }, []);
 
   const updateData = useCallback((updater: (prev: AppData) => AppData) => {
     setData((prev) => {
@@ -107,7 +113,7 @@ export function SpendismApp() {
   }
 
   return (
-    <div className="flex min-h-screen lg:max-w-[1280px] lg:mx-auto lg:w-full">
+    <div className="flex min-h-[100dvh] lg:max-w-[1280px] lg:mx-auto lg:w-full">
       <NavBar activeView={activeView} onNavigate={setActiveView} />
 
       <main className="flex-1 min-w-0 lg:py-8 lg:pr-8 pb-24 lg:pb-8">
