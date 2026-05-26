@@ -26,7 +26,7 @@ const BottomSheetContent = React.forwardRef<
         "fixed z-50 bg-background outline-none",
         // Mobile: slide up from bottom
         "inset-x-0 bottom-0 rounded-t-[1.25rem] border-t border-border",
-        "max-h-[92dvh] overflow-y-auto overscroll-contain",
+        "max-h-[92dvh] flex flex-col",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
         "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
@@ -46,7 +46,9 @@ const BottomSheetContent = React.forwardRef<
           <div className="h-1.5 w-12 rounded-full bg-muted-foreground/25" />
         </div>
       )}
-      {children}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+        {children}
+      </div>
       <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>

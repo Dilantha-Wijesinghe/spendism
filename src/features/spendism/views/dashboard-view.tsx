@@ -9,22 +9,22 @@ import { TransactionItem, EmptyState } from "../components/transaction-list";
 import {
   getPeriodSummary, getBudgetProgress, getMonthlyTrend, getNetBalance,
 } from "@/lib/calculations";
-import { formatMoneyCompact } from "@/lib/money";
+import { formatMoney, formatMoneyCompact } from "@/lib/money";
 import { Wallet, TrendingDown, TrendingUp, PiggyBank } from "lucide-react";
-import type { AppData, ViewId } from "@/lib/types";
+import type { AppData, AppSettings, ViewId } from "@/lib/types";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label, settings }: any) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-card border border-border rounded-lg p-3 shadow-[var(--shadow-card)] text-xs">
       <p className="font-semibold text-foreground mb-1">{label}</p>
       {payload.map((entry: { name: string; value: number; color: string }, i: number) => (
         <p key={i} style={{ color: entry.color }} className="tabular-amount">
-          {entry.name}: {entry.value.toFixed(0)}
+          {entry.name}: {(settings as AppSettings)?.currencySymbol}{entry.value.toFixed(0)}
         </p>
       ))}
     </div>
@@ -94,7 +94,7 @@ export function DashboardView({
           </p>
           <p className="text-4xl font-bold tabular-amount mt-2 text-white">
             {netBalance < 0 ? "-" : ""}
-            {formatMoneyCompact(Math.abs(netBalance), settings)}
+            {formatMoney(Math.abs(netBalance), settings)}
           </p>
           <p className="text-xs text-white/60 mt-1">All-time income minus expenses</p>
         </CardContent>
@@ -141,8 +141,8 @@ export function DashboardView({
                 <BarChart data={trendData} barGap={4}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} width={36} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${settings.currencySymbol}${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} width={40} />
+                  <Tooltip content={<CustomTooltip settings={settings} />} />
                   <Bar dataKey="income" name="Income" fill="hsl(200 98% 18%)" radius={[3, 3, 0, 0]} maxBarSize={28} />
                   <Bar dataKey="expenses" name="Expenses" fill="hsl(4 78% 50% / 0.7)" radius={[3, 3, 0, 0]} maxBarSize={28} />
                 </BarChart>
