@@ -5,8 +5,8 @@ const STORAGE_KEY = "spendism_data";
 const CURRENT_VERSION = 1;
 
 const DEFAULT_SETTINGS: AppSettings = {
-  currency: "USD",
-  currencySymbol: "$",
+  currency: "LKR",
+  currencySymbol: "Rs",
   weekStartsOn: 1,
 };
 

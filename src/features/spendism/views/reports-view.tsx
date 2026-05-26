@@ -8,7 +8,7 @@ import { getMonthlyTrend, getCategoryBreakdown, getPeriodSummary, filterByPeriod
 import { formatMoney, formatMoneyCompact } from "@/lib/money";
 import { TrendingUp, TrendingDown, PiggyBank, Activity } from "lucide-react";
 import { TimeFilter } from "../components/time-filter";
-import type { AppData, TimePeriod } from "@/lib/types";
+import type { AppData, AppSettings, TimePeriod } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -27,14 +27,15 @@ const CHART_COLORS = [
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const BarTooltip = ({ active, payload, label }: any) => {
+const BarTooltip = ({ active, payload, label, settings }: any) => {
   if (!active || !payload?.length) return null;
+  const sym = (settings as AppSettings)?.currencySymbol ?? "";
   return (
     <div className="bg-card border border-border rounded-lg p-3 shadow-[var(--shadow-card)] text-xs">
       <p className="font-semibold mb-1">{label}</p>
       {payload.map((entry: { name: string; value: number; color: string }, i: number) => (
         <p key={i} style={{ color: entry.color }} className="tabular-amount">
-          {entry.name}: ${entry.value.toFixed(0)}
+          {entry.name}: {sym}{entry.value.toFixed(0)}
         </p>
       ))}
     </div>
@@ -42,12 +43,13 @@ const BarTooltip = ({ active, payload, label }: any) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PieTooltipContent = ({ active, payload }: any) => {
+const PieTooltipContent = ({ active, payload, settings }: any) => {
   if (!active || !payload?.length) return null;
+  const sym = (settings as AppSettings)?.currencySymbol ?? "";
   return (
     <div className="bg-card border border-border rounded-lg p-3 shadow-[var(--shadow-card)] text-xs">
       <p className="font-semibold">{payload[0].name}</p>
-      <p className="tabular-amount text-foreground">${payload[0].value.toFixed(2)}</p>
+      <p className="tabular-amount text-foreground">{sym}{payload[0].value.toFixed(2)}</p>
       <p className="text-muted-foreground">{payload[0].payload.percentage.toFixed(1)}%</p>
     </div>
   );
@@ -126,8 +128,8 @@ export function ReportsView({ data }: ReportsViewProps) {
               <BarChart data={trendData} barGap={4}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
-                <Tooltip content={<BarTooltip />} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${settings.currencySymbol}${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
+                <Tooltip content={<BarTooltip settings={settings} />} />
                 <Bar dataKey="income" name="Income" fill="hsl(200 98% 18%)" radius={[3, 3, 0, 0]} maxBarSize={32} />
                 <Bar dataKey="expenses" name="Expenses" fill="hsl(4 78% 50% / 0.7)" radius={[3, 3, 0, 0]} maxBarSize={32} />
               </BarChart>
@@ -187,7 +189,7 @@ export function ReportsView({ data }: ReportsViewProps) {
                       <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip content={<PieTooltipContent />} />
+                  <Tooltip content={<PieTooltipContent settings={settings} />} />
                   <Legend
                     iconType="circle"
                     iconSize={8}
