@@ -10,7 +10,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   weekStartsOn: 1,
 };
 
-const DEFAULT_DATA: AppData = {
+export const DEFAULT_DATA: AppData = {
   transactions: [],
   budgets: [],
   categories: DEFAULT_CATEGORIES,
