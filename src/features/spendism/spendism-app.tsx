@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { NavBar } from "./components/nav-bar";
 import { TransactionForm } from "./components/transaction-form";
 import { DashboardView } from "./views/dashboard-view";
@@ -8,30 +8,28 @@ import { TransactionsView } from "./views/transactions-view";
 import { BudgetView } from "./views/budget-view";
 import { ReportsView } from "./views/reports-view";
 import { SettingsView } from "./views/settings-view";
-import { loadData, saveData, clearData, DEFAULT_DATA } from "@/lib/storage";
+import { createDefaultData, loadData, saveData, clearData } from "@/lib/storage";
 import { Plus } from "lucide-react";
 import type { AppData, Transaction, Budget, AppSettings, TransactionType, ViewId } from "@/lib/types";
 
 export type { ViewId };
 
 export function SpendismApp() {
-  const [data, setData] = useState<AppData>(DEFAULT_DATA);
+  const [data, setData] = useState<AppData>(() => createDefaultData());
+  const [hydrated, setHydrated] = useState(false);
   const [activeView, setActiveView] = useState<ViewId>("dashboard");
   const [formOpen, setFormOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [defaultFormType, setDefaultFormType] = useState<TransactionType>("expense");
   const [editingBudgetId, setEditingBudgetId] = useState<string | null>(null);
 
-  const initialized = useRef(false);
-
   useEffect(() => {
-    if (!initialized.current) return;
-    saveData(data);
-  }, [data]);
+    if (hydrated) saveData(data);
+  }, [hydrated, data]);
 
   useEffect(() => {
     setData(loadData());
-    initialized.current = true;
+    setHydrated(true);
   }, []);
 
   const updateData = useCallback((updater: (prev: AppData) => AppData) => {

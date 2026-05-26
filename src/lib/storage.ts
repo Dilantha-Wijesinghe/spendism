@@ -10,13 +10,23 @@ const DEFAULT_SETTINGS: AppSettings = {
   weekStartsOn: 1,
 };
 
-export const DEFAULT_DATA: AppData = {
+const DEFAULT_DATA: AppData = {
   transactions: [],
   budgets: [],
   categories: DEFAULT_CATEGORIES,
   settings: DEFAULT_SETTINGS,
   version: CURRENT_VERSION,
 };
+
+export function createDefaultData(): AppData {
+  return {
+    transactions: [],
+    budgets: [],
+    categories: [...DEFAULT_CATEGORIES],
+    settings: { ...DEFAULT_SETTINGS },
+    version: CURRENT_VERSION,
+  };
+}
 
 export function loadData(): AppData {
   if (typeof window === "undefined") return DEFAULT_DATA;
